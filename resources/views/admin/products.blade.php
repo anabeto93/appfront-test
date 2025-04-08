@@ -45,7 +45,7 @@
         <div class="admin-header">
             <h1>Admin - Products</h1>
             <div>
-                <a href="{{ route('admin.add.product') }}" class="btn btn-primary">Add New Product</a>
+                <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Add New Product</a>
                 <a href="{{ route('logout') }}" class="btn btn-secondary" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
                 <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
                     @csrf
@@ -81,8 +81,12 @@
                     <td>{{ $product->name }}</td>
                     <td>${{ number_format($product->price, 2) }}</td>
                     <td>
-                        <a href="{{ route('admin.edit.product', $product->id) }}" class="btn btn-primary">Edit</a>
-                        <a href="{{ route('admin.delete.product', $product->id) }}" class="btn btn-secondary" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                        <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-primary">Edit</a>
+                        <a href="#" class="btn btn-secondary" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this product?')) document.getElementById('delete-form-{{ $product->id }}').submit();">Delete</a>
+                        <form id="delete-form-{{ $product->id }}" action="{{ route('admin.products.destroy', ['product' => $product->id]) }}" method="POST" style="display: none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
                     </td>
                 </tr>
                 @endforeach

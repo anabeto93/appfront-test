@@ -9,21 +9,20 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Jobs\SendPriceChangeNotification;
 
-class AdminController extends Controller
+class AdminProductController extends Controller
 {
-    public function products()
+    public function index()
     {
         $products = Product::all();
         return view('admin.products', compact('products'));
     }
 
-    public function editProduct($id)
+    public function edit(Product $product)
     {
-        $product = Product::find($id);
         return view('admin.edit_product', compact('product'));
     }
 
-    public function updateProduct(Request $request, $id)
+    public function update(Request $request, $id)
     {
         // Validate the name field
         $validator = Validator::make($request->all(), [
@@ -70,23 +69,23 @@ class AdminController extends Controller
             }
         }
 
-        return redirect()->route('admin.products')->with('success', 'Product updated successfully');
+        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully');
     }
 
-    public function deleteProduct($id)
+    public function destroy(Product $product)
     {
-        $product = Product::find($id);
+        // $product = Product::find($id);
         $product->delete();
 
-        return redirect()->route('admin.products')->with('success', 'Product deleted successfully');
+        return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully');
     }
 
-    public function addProductForm()
+    public function create()
     {
         return view('admin.add_product');
     }
 
-    public function addProduct(Request $request)
+    public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:3',
@@ -116,6 +115,6 @@ class AdminController extends Controller
 
         $product->save();
 
-        return redirect()->route('admin.products')->with('success', 'Product added successfully');
+        return redirect()->route('admin.products.index')->with('success', 'Product added successfully');
     }
 }

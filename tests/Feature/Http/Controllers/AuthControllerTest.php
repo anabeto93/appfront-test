@@ -33,7 +33,7 @@ class AuthControllerTest extends TestCase
         ]);
         
         // Assert redirect to admin products page after successful login
-        $response->assertRedirect(route('admin.products'));
+        $response->assertRedirect(route('admin.products.index'));
         
         // Assert user is authenticated
         $this->assertTrue(Auth::check());

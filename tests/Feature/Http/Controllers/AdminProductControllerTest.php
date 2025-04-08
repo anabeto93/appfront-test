@@ -28,7 +28,7 @@ class AdminProductControllerTest extends TestCase
         // Create some products
         $products = Product::factory()->count(3)->create();
         
-        $response = $this->get(route('admin.products'));
+        $response = $this->get(route('admin.products.index'));
         
         $response->assertStatus(200);
         $response->assertViewIs('admin.products');
@@ -48,7 +48,7 @@ class AdminProductControllerTest extends TestCase
         // Create a product
         $product = Product::factory()->create();
         
-        $response = $this->get(route('admin.edit.product', ['id' => $product->id]));
+        $response = $this->get(route('admin.products.edit', ['product' => $product]));
         
         $response->assertStatus(200);
         $response->assertViewIs('admin.edit_product');
@@ -64,7 +64,7 @@ class AdminProductControllerTest extends TestCase
         // Logout the user
         Auth::logout();
         
-        $response = $this->get(route('admin.products'));
+        $response = $this->get(route('admin.products.index'));
         
         // Should redirect to login
         $response->assertRedirect(route('login'));
@@ -72,7 +72,7 @@ class AdminProductControllerTest extends TestCase
 
     public function test_admin_can_see_add_product_form()
     {
-        $response = $this->get(route('admin.add.product'));
+        $response = $this->get(route('admin.products.create'));
         
         $response->assertStatus(200);
         $response->assertViewIs('admin.add_product');
@@ -87,10 +87,10 @@ class AdminProductControllerTest extends TestCase
             'image' => null,
         ];
         
-        $response = $this->post(route('admin.add.product.submit'), $productData);
+        $response = $this->post(route('admin.products.store'), $productData);
         
         // Should redirect to products list
-        $response->assertRedirect(route('admin.products'));
+        $response->assertRedirect(route('admin.products.index'));
         
         // Check if product was created in the database
         $this->assertDatabaseHas('products', [
@@ -115,10 +115,10 @@ class AdminProductControllerTest extends TestCase
             'image' => null,
         ];
         
-        $response = $this->post(route('admin.update.product', ['id' => $product->id]), $updatedData);
+        $response = $this->put(route('admin.products.update', ['product' => $product->id]), $updatedData);
         
         // Should redirect to products list
-        $response->assertRedirect(route('admin.products'));
+        $response->assertRedirect(route('admin.products.index'));
         
         // Check if product was updated in the database
         $this->assertDatabaseHas('products', [
@@ -142,10 +142,10 @@ class AdminProductControllerTest extends TestCase
         // Verify it exists in the database
         $this->assertDatabaseHas('products', ['id' => $product->id]);
         
-        $response = $this->get(route('admin.delete.product', ['id' => $product->id]));
+        $response = $this->delete(route('admin.products.destroy', ['product' => $product]));
         
         // Should redirect to products list
-        $response->assertRedirect(route('admin.products'));
+        $response->assertRedirect(route('admin.products.index'));
         
         // Check if product was deleted from the database
         $this->assertDatabaseMissing('products', ['id' => $product->id]);
@@ -166,7 +166,7 @@ class AdminProductControllerTest extends TestCase
             'price' => 75.99,
         ];
         
-        $response = $this->post(route('admin.update.product', ['id' => $product->id]), $invalidData);
+        $response = $this->put(route('admin.products.update', ['product' => $product->id]), $invalidData);
         
         // Should redirect back with errors
         $response->assertSessionHasErrors(['name']);
@@ -182,8 +182,50 @@ class AdminProductControllerTest extends TestCase
     {
         $nonExistentId = 9999; // Assuming this ID doesn't exist
         
-        $response = $this->get(route('admin.edit.product', ['id' => $nonExistentId]));
+        $response = $this->get(route('admin.products.edit', ['product' => $nonExistentId]));
         
         $response->assertStatus(404);
+    }
+
+    public function test_post_request_to_update_product_is_not_allowed()
+    {
+        // Create a product
+        $product = Product::factory()->create([
+            'name' => 'Original Name',
+            'price' => 50.00
+        ]);
+        
+        $updatedData = [
+            'name' => 'Updated Product Name',
+            'price' => 75.99,
+        ];
+        
+        // Try to update with POST (old way)
+        $response = $this->post(route('admin.products.update', ['product' => $product->id]), $updatedData);
+        
+        // Should return 405 Method Not Allowed
+        $response->assertStatus(405);
+        
+        // Product should remain unchanged in database
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'name' => 'Original Name',
+            'price' => 50.00
+        ]);
+    }
+
+    public function test_get_request_to_delete_product_is_not_allowed()
+    {
+        // Create a product
+        $product = Product::factory()->create();
+        
+        // Try to delete with GET (old way)
+        $response = $this->get(route('admin.products.destroy', ['product' => $product->id]));
+        
+        // Should return 405 Method Not Allowed
+        $response->assertStatus(405);
+        
+        // Product should still exist in database
+        $this->assertDatabaseHas('products', ['id' => $product->id]);
     }
 }
