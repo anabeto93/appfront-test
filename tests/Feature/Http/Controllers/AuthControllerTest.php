@@ -74,12 +74,32 @@ class AuthControllerTest extends TestCase
         $this->assertTrue(Auth::check());
         
         // Logout
-        $response = $this->get('/logout');
+        $response = $this->post('/logout');
         
         // Assert redirect to login page
         $response->assertRedirect(route('login'));
         
         // Assert user is not authenticated anymore
         $this->assertFalse(Auth::check());
+    }
+
+    public function test_get_request_to_logout_is_not_allowed()
+    {
+        // Create and login a user
+        /** @var User $user */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        
+        // Assert user is authenticated
+        $this->assertTrue(Auth::check());
+        
+        // Attempt to logout with GET - should not work
+        $response = $this->get('/logout');
+        
+        // Should return 405 Method Not Allowed
+        $response->assertStatus(405);
+        
+        // User should still be authenticated
+        $this->assertTrue(Auth::check());
     }
 }

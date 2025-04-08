@@ -37,6 +37,7 @@
             margin-bottom: 20px;
             border-radius: 4px;
         }
+        
     </style>
 </head>
 <body>
@@ -45,7 +46,10 @@
             <h1>Admin - Products</h1>
             <div>
                 <a href="{{ route('admin.add.product') }}" class="btn btn-primary">Add New Product</a>
-                <a href="{{ route('logout') }}" class="btn btn-secondary">Logout</a>
+                <a href="{{ route('logout') }}" class="btn btn-secondary" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
+                    @csrf
+                </form>
             </div>
         </div>
 
