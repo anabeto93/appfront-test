@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class AdminControllerTest extends TestCase
+class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
