@@ -7,7 +7,7 @@ use App\Http\Controllers\AuthController;
 
 Route::get('/', [ProductController::class, 'index']);
 
-Route::get('/products/{product_id}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 // Authentication
 Route::middleware(['throttle:6,1'])->group(function() {
