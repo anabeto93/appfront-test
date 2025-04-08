@@ -102,4 +102,52 @@ class AuthControllerTest extends TestCase
         // User should still be authenticated
         $this->assertTrue(Auth::check());
     }
+
+    public function test_login_requires_email_and_password()
+    {
+        // Submit without email
+        $response = $this->post('/login', [
+            'password' => 'password',
+        ]);
+        $response->assertSessionHasErrors('email');
+        
+        // Submit without password
+        $response = $this->post('/login', [
+            'email' => 'test@example.com',
+        ]);
+        $response->assertSessionHasErrors('password');
+    }
+
+    public function test_login_attempt_is_rate_limited()
+    {
+        // Attempt multiple logins in quick succession
+        for ($i = 0; $i < 6; $i++) {
+            $this->post('/login', [
+                'email' => 'wrong@example.com',
+                'password' => 'wrongpassword',
+            ]);
+        }
+        
+        // Next attempt should be throttled
+        $response = $this->post('/login', [
+            'email' => 'wrong@example.com',
+            'password' => 'wrongpassword',
+        ]);
+        
+        $response->assertStatus(429); // Too Many Requests
+    }
+
+    public function test_session_is_regenerated_after_logout()
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        
+        $initialSession = session()->getId();
+        $this->assertEquals($initialSession, session()->getId());
+        
+        $this->post('/logout');
+        
+        $this->assertNotEquals($initialSession, session()->getId());
+    }
 }
