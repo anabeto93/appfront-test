@@ -75,7 +75,7 @@
                     <td>{{ $product->id }}</td>
                     <td>
                         @if($product->image)
-                            <img src="{{ env('APP_URL') }}/{{ $product->image }}" width="50" height="50" alt="{{ $product->name }}">
+                            <img src="{{ config('app.url') }}/{{ $product->image }}" width="50" height="50" alt="{{ $product->name }}">
                         @endif
                     </td>
                     <td>{{ $product->name }}</td>
