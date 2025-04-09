@@ -6,9 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 use App\Mail\PriceChangeNotification;
 use App\Models\Product;
 
@@ -21,8 +19,12 @@ class SendPriceChangeNotification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(public $product, public $oldPrice, public $newPrice, public $email)
-    {
+    public function __construct(
+        public Product $product,
+        public float $oldPrice,
+        public float $newPrice,
+        public string $email
+    ){
         //
     }
 

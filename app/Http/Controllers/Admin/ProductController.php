@@ -8,6 +8,8 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Services\ImageService;
 use App\Services\PriceChangeService;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class ProductController extends Controller
 {
@@ -17,23 +19,23 @@ class ProductController extends Controller
         //
     }
 
-    public function index()
+    public function index(): View
     {
-        $products = Product::all();
+        $products = Product::paginate(20);
         return view('admin.products', compact('products'));
     }
 
-    public function edit(Product $product)
+    public function edit(Product $product): View
     {
         return view('admin.edit_product', compact('product'));
     }
 
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
         // Store the old price before updating
         $oldPrice = $product->price;
 
-        $product->update($request->all());
+        $product->update($request->validated());
 
         if ($request->hasFile('image')) {
             $product->image = 'storage/' . $this->imageService->upload($request->file('image'));
@@ -49,7 +51,7 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully');
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product): RedirectResponse
     {
         $product->delete();
 
@@ -61,7 +63,7 @@ class ProductController extends Controller
         return view('admin.add_product');
     }
 
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $request): RedirectResponse
     {
         $product = Product::create([
             'name' => $request->name,
