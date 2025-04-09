@@ -71,7 +71,7 @@
 
             <div class="form-group">
                 <label for="image">Product Image</label>
-                <input type="file" id="image" name="image" class="form-control">
+                <input type="file" id="image" name="image" class="form-control" accept="image/*">
                 <small>Leave empty to use default image</small>
             </div>
 

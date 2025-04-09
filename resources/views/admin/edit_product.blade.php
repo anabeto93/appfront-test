@@ -79,7 +79,7 @@
                 @if($product->image)
                     <img src="{{ config('app.url') }}/{{ $product->image }}" class="product-image" alt="{{ $product->name }}">
                 @endif
-                <input type="file" id="image" name="image" class="form-control">
+                <input type="file" id="image" name="image" class="form-control" accept="image/*">
                 <small>Leave empty to keep current image</small>
             </div>
 
